@@ -9,7 +9,6 @@ router = APIRouter(
     tags=["Image Captioning"]
 )
 
-
 @router.post("")
 async def receive_image(file: bytes = File(...)):
     if not file:
@@ -19,7 +18,7 @@ async def receive_image(file: bytes = File(...)):
 
     return caption
 
-def image_captioning(img):
+async def image_captioning(img):
     img = Image.open(io.BytesIO(img))
     if img.mode != "RGB":
         img = img.convert("RGB")
@@ -28,3 +27,7 @@ def image_captioning(img):
 
     return image_to_text(img)[0]["generated_text"]
 
+
+@router.get("/test")
+async def root():
+    return {"message": "router test"}
