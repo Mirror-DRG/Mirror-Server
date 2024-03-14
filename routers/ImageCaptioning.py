@@ -18,7 +18,7 @@ async def receive_image(file: bytes = File(...)):
 
     return caption
 
-def image_captioning(img):
+async def image_captioning(img):
     img = Image.open(io.BytesIO(img))
     if img.mode != "RGB":
         img = img.convert("RGB")
