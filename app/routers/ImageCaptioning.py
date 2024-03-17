@@ -34,7 +34,7 @@ async def receive_image(image: UploadFile = File(...)):
 
 #@router.post("/test")
 #async def receive_image(reqBody: dict = None):
-#    print(reqBody) # dict type이 아닌 이슈로 내용을 볼 수 있는 에러가 남
+#    print(reqBody) # dict type error
 
 def image_captioning(img):
     img = Image.open(io.BytesIO(img))
