@@ -1,4 +1,10 @@
 from fastapi import APIRouter, File, HTTPException, UploadFile
+
+# 번역 관련
+from googletrans import Translator
+import httpx
+
+# model 관련 import
 from PIL import Image
 from transformers import pipeline
 import io
@@ -7,20 +13,15 @@ router = APIRouter(
     prefix="/captioning",
     tags=["Image Captioning"]
 )
-
-#@router.post("")
-#async def receive_image(image: bytes = File(...)):
-#    if not image:
-#        raise HTTPException(status_code=400, detail="No file provided")
-#
-#     print(image)
-#    caption = image_captioning(image)
-#
-#    return caption
+# google
+translator = Translator()
+# naver papago
+clientID = "clientID"
+clientSecret = "clientSecret"
 
 @router.post("")
 async def receive_image(image: UploadFile = File(...)):
-     # filename, exception?
+     # filename exception
      if image.filename.split(".")[-1] not in ["jpg", "jpeg"]:
         print("not jpg or jpeg") # raise exception 
      
@@ -29,12 +30,25 @@ async def receive_image(image: UploadFile = File(...)):
 
      image_byte = await image.read()
      caption = image_captioning(image_byte)
+     print(caption)
 
-     return caption
+     # google translation
+     translation_caption = translator.translate(caption, dest='ko').text
 
-#@router.post("/test")
-#async def receive_image(reqBody: dict = None):
-#    print(reqBody) # dict type error
+     # papago translation
+     # async with httpx.AsyncClient() as client:
+     #     response = await client.post(
+     #         "https://naveropenapi.apigw.ntruss.com/nmt/v1/translation",
+     #         headers={
+     #             "X-NCP-APIGW-API-KEY-ID": clientID,
+     #             "X-NCP-APIGW-API-KEY": clientSecret
+     #         },
+     #         json={"source": "en", "target": "ko", "text": caption},
+     #     )
+     # translation_caption = response.json()["message"]["result"]["translatedText"]
+
+     return translation_caption
+
 
 def image_captioning(img):
     img = Image.open(io.BytesIO(img))
