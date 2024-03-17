@@ -1,22 +1,40 @@
-from fastapi import APIRouter, File, HTTPException
+from fastapi import APIRouter, File, HTTPException, UploadFile
 from PIL import Image
 from transformers import pipeline
 import io
-
 
 router = APIRouter(
     prefix="/captioning",
     tags=["Image Captioning"]
 )
 
+#@router.post("")
+#async def receive_image(image: bytes = File(...)):
+#    if not image:
+#        raise HTTPException(status_code=400, detail="No file provided")
+#
+#     print(image)
+#    caption = image_captioning(image)
+#
+#    return caption
+
 @router.post("")
-async def receive_image(file: bytes = File(...)):
-    if not file:
+async def receive_image(image: UploadFile = File(...)):
+     # filename, exception?
+     if image.filename.split(".")[-1] not in ["jpg", "jpeg"]:
+        print("not jpg or jpeg") # raise exception 
+     
+     if not image:
         raise HTTPException(status_code=400, detail="No file provided")
 
-    caption = image_captioning(file)
+     image_byte = await image.read()
+     caption = image_captioning(image_byte)
 
-    return caption
+     return caption
+
+#@router.post("/test")
+#async def receive_image(reqBody: dict = None):
+#    print(reqBody) # dict type이 아닌 이슈로 내용을 볼 수 있는 에러가 남
 
 def image_captioning(img):
     img = Image.open(io.BytesIO(img))
